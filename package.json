@@ -1,0 +1,34 @@
+{
+  "name": "@frontier-forms/ui-kit-semantic-ui",
+  "version": "0.0.1",
+  "description": "Semantic UI UI-kit for Frontier forms",
+  "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frontier-forms/frontier-forms-ui-kit-semantic-ui.git"
+  },
+  "keywords": [
+    "ui-kit",
+    "react",
+    "forms",
+    "frontier-forms"
+  ],
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "Charly POLY <cpoly55@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/frontier-forms/frontier-forms-ui-kit-semantic-ui/issues"
+  },
+  "homepage": "https://github.com/frontier-forms/frontier-forms-ui-kit-semantic-ui#readme",
+  "devDependencies": {
+    "@types/json-schema": "^7.0.3",
+    "@types/react": "^16.8.13",
+    "typescript": "^3.4.3"
+  },
+  "dependencies": {
+    "frontier-forms": "../frontier-forms",
+    "semantic-ui-react": "^0.86.0"
+  }
+}
