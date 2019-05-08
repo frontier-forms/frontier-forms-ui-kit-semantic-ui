@@ -1,5 +1,5 @@
 import * as React from "react";
-import { FormGroup, Input, Checkbox, Select, Form, Label, Message, Popup } from "semantic-ui-react";
+import { FormGroup, Input, Checkbox, Select, Form, Label, Message, Popup, Rating, TextArea } from "semantic-ui-react";
 import { JSONSchema7TypeName } from 'json-schema'
 import { UIKitResolver, UIKITFieldProps } from 'frontier-forms';
 
@@ -25,17 +25,42 @@ export const SemanticUIkit: UIKitResolver = (path, type, required, children) => 
     } else {
 
         return props => {
-            const wrappedComponent = React.createElement(
-                Component,
-                {
-                    onChange: e => {
-                        const value = e.currentTarget.value;
-                        props.change(value.length > 0 ? value : null);
-                    },
-                    value: props.value,
-                    children: children
-                } as any
-            );
+            let wrappedComponent;
+            if (path.match('rating')) {
+                wrappedComponent = React.createElement(
+                    Rating,
+                    {
+                        maxRating: 5,
+                        onRate: (e, { rating }) => {
+                            props.change(rating);
+                        },
+                        value: props.value
+                    } as any
+                );
+            } else if (path.match('comment')) {
+                wrappedComponent = React.createElement(
+                    TextArea,
+                    {
+                        onChange: e => {
+                            const value = e.currentTarget.value;
+                            props.change(value.length > 0 ? value : null);
+                        },
+                        value: props.value
+                    } as any
+                );
+            } else {
+                wrappedComponent = React.createElement(
+                    Component,
+                    {
+                        onChange: e => {
+                            const value = e.currentTarget.value;
+                            props.change(value.length > 0 ? value : null);
+                        },
+                        value: props.value,
+                        children: children
+                    } as any
+                );
+            }
             return (
                 <p>
                     {
