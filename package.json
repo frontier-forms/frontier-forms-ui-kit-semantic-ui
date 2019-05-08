@@ -14,17 +14,19 @@
     "frontier-forms"
   ],
   "scripts": {
+    "release": "tsc; standard-version",
     "build": "tsc"
   },
-  "author": "Charly POLY <cpoly55@gmail.com>",
+  "author": "Charly POLY <cpoly55@gmail.com>, Tom Chmelevskij <T.Chmelevskij@gmail.com>",
+  "homepage": "https://frontier-forms.dev",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/frontier-forms/frontier-forms-ui-kit-semantic-ui/issues"
   },
-  "homepage": "https://github.com/frontier-forms/frontier-forms-ui-kit-semantic-ui#readme",
   "devDependencies": {
     "@types/json-schema": "^7.0.3",
     "@types/react": "^16.8.13",
+    "standard-version": "^5.0.2",
     "typescript": "^3.4.3"
   },
   "dependencies": {

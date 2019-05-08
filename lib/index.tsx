@@ -1,8 +1,7 @@
 import * as React from "react";
-import { FormGroup, Input, Checkbox, Select, Form, Label, Message } from "semantic-ui-react";
+import { FormGroup, Input, Checkbox, Select, Form, Label, Message, Popup } from "semantic-ui-react";
 import { JSONSchema7TypeName } from 'json-schema'
 import { UIKitResolver, UIKITFieldProps } from 'frontier-forms';
-import { createElement } from "react";
 
 const typeToComponentMap: { [k in JSONSchema7TypeName]: React.FunctionComponent | React.ComponentClass | undefined } = {
     object: FormGroup,
@@ -19,7 +18,7 @@ const UnknownField: React.SFC<{ path: string, type: string }> = props => {
     return null;
 }
 
-export const SemanticUIkit: UIKitResolver = (path, type, children) => {
+export const SemanticUIkit: UIKitResolver = (path, type, required, children) => {
     const Component = typeToComponentMap[type];
     if (!Component) {
         return () => UnknownField({ path, type });
@@ -37,32 +36,28 @@ export const SemanticUIkit: UIKitResolver = (path, type, children) => {
                     children: children
                 } as any
             );
-
-            const error = props.error ?
-                React.createElement(Message,
+            return (
+                <p>
                     {
-                        error: true,
-                        content: props.error
+                        type == 'object' ?
+                            wrappedComponent :
+                            <Form.Field required={required}>
+                                <label htmlFor="">{path.charAt(0).toUpperCase() + path.slice(1)}</label>
+                                {wrappedComponent}
+                                {
+                                    !!props.error && (props.dirty || props.submitFailed) &&
+                                    <Label basic color='red' pointing='above'>
+                                        {
+                                            props.error == 'required' ?
+                                                "This field is required" :
+                                                "There is an error"
+                                        }
+                                    </Label>
+                                }
+                            </Form.Field>
                     }
-                ) :
-                null;
-
-            return type == 'object' ?
-                wrappedComponent :
-                React.createElement(
-                    Form.Field,
-                    {
-                        children: [
-                            React.createElement(
-                                Label,
-                                null,
-                                path
-                            ),
-                            wrappedComponent,
-                            error
-                        ]
-                    }
-                )
+                </p>
+            );
         }
     }
 };
