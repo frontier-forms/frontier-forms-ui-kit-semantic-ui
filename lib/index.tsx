@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Input, Form, Label, Rating, TextArea } from "semantic-ui-react";
+import { Input, Form, Label, Rating, TextArea, Button } from "semantic-ui-react";
 import { UIKit, UIKITFieldProps, UIKitAPI } from 'frontier-forms';
 
 const translations = {
@@ -8,7 +8,10 @@ const translations = {
   'createUser.email': "E-mail",
   'createUser.company': "Company name",
   'createFeedback.rating': 'How was your stay?',
-  'createFeedback.comment': 'Please leave a feedback about the property'
+  'createFeedback.comment': 'Please leave a feedback about the property',
+  'createCatContestRegister.firstname': 'Your first name',
+  'createCatContestRegister.lastname': 'Your last name',
+  'createCatContestRegister.cats': 'Select the cats that will participate',
 }
 
 const FieldWrapper: React.SFC<UIKITFieldProps & { path: string, type: string, required: boolean }> = props => {
@@ -71,6 +74,54 @@ export const SemanticUIkit: UIKitAPI = UIKit().
         />
       </FieldWrapper>
     )
+  }).
+  type('array', (path, required, children) => {
+    return (props: UIKITFieldProps & { list?: { name: string }[] }) => {
+      const values = (props.value || []) as { name: string }[];
+      const list = props.list || [];
+      const change = (values) => props.change(values);
+      return (
+        <FieldWrapper required={required} type={'string'} path={path} {...props}>
+          <ul>
+            {
+              values.map(val => (
+                <li>
+                  {val.name}&nbsp;
+                  <Button
+                    color='red'
+                    onClick={e => {
+                      e.preventDefault()
+                      change(values.filter(v => v.name !== val.name))
+                    }}
+                  >
+                    remove
+                  </Button>
+                </li>
+              ))
+            }
+          </ul>
+          <br />
+          <ul>
+            {
+              list.filter(v => !values.find(vv => vv.name == v.name)).map(val => (
+                <li>
+                  {val.name}&nbsp;
+                  <Button
+                    color='blue'
+                    onClick={e => {
+                      e.preventDefault()
+                      change(values.concat({ name: val.name }))
+                    }}
+                  >
+                    add
+                  </Button>
+                </li>
+              ))
+            }
+          </ul>
+        </FieldWrapper>
+      )
+    };
   }).
   path(/rating/ as any, (path, type, required) => {
     return (props: UIKITFieldProps & { maxRating?: number }) => (
