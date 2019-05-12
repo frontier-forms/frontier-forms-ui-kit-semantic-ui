@@ -3,10 +3,12 @@ import { Input, Form, Label, Rating, TextArea } from "semantic-ui-react";
 import { UIKit, UIKITFieldProps, UIKitAPI } from 'frontier-forms';
 
 const translations = {
-  'firstname': "First name",
-  'lastname': "Last name",
-  'email': "E-mail",
-  'company': "Company name"
+  'createUser.firstname': "First name",
+  'createUser.lastname': "Last name",
+  'createUser.email': "E-mail",
+  'createUser.company': "Company name",
+  'createFeedback.rating': 'How was your stay?',
+  'createFeedback.comment': 'Please leave a feedback about the property'
 }
 
 const FieldWrapper: React.SFC<UIKITFieldProps & { path: string, type: string, required: boolean }> = props => {
@@ -20,7 +22,7 @@ const FieldWrapper: React.SFC<UIKITFieldProps & { path: string, type: string, re
               {
                 translations[props.path] ?
                   translations[props.path] :
-                  props.path.charAt(0).toUpperCase() + props.path.slice(1)
+                  props.path
               }
             </label>
             {props.children}
