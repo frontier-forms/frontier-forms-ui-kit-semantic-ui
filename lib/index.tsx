@@ -1,88 +1,84 @@
 import * as React from "react";
-import { FormGroup, Input, Checkbox, Select, Form, Label, Message, Popup, Rating, TextArea } from "semantic-ui-react";
-import { JSONSchema7TypeName } from 'json-schema'
-import { UIKitResolver, UIKITFieldProps } from 'frontier-forms';
+import { Input, Form, Label, Rating, TextArea } from "semantic-ui-react";
+import { UIKit, UIKITFieldProps, UIKitAPI } from 'frontier-forms';
 
-const typeToComponentMap: { [k in JSONSchema7TypeName]: React.FunctionComponent | React.ComponentClass | undefined } = {
-    object: FormGroup,
-    string: Input,
-    boolean: Checkbox,
-    integer: Input,
-    number: Input,
-    null: undefined,
-    array: Select
-}
-
-const UnknownField: React.SFC<{ path: string, type: string }> = props => {
-    console.warn(`No component matching for field "${props.path}" with type ${props.type}`);
-    return null;
-}
-
-export const SemanticUIkit: UIKitResolver = (path, type, required, children) => {
-    const Component = typeToComponentMap[type];
-    if (!Component) {
-        return () => UnknownField({ path, type });
-    } else {
-
-        return props => {
-            let wrappedComponent;
-            if (path.match('rating')) {
-                wrappedComponent = React.createElement(
-                    Rating,
-                    {
-                        maxRating: 5,
-                        onRate: (e, { rating }) => {
-                            props.change(rating);
-                        },
-                        value: props.value
-                    } as any
-                );
-            } else if (path.match('comment')) {
-                wrappedComponent = React.createElement(
-                    TextArea,
-                    {
-                        onChange: e => {
-                            const value = e.currentTarget.value;
-                            props.change(value.length > 0 ? value : null);
-                        },
-                        value: props.value
-                    } as any
-                );
-            } else {
-                wrappedComponent = React.createElement(
-                    Component,
-                    {
-                        onChange: e => {
-                            const value = e.currentTarget.value;
-                            props.change(value.length > 0 ? value : null);
-                        },
-                        value: props.value,
-                        children: children
-                    } as any
-                );
+const FieldWrapper: React.SFC<UIKITFieldProps & { path: string, type: string, required: boolean }> = props => {
+  return (
+    <p>
+      {
+        props.type == 'object' ?
+          props.children :
+          <Form.Field required={props.required}>
+            <label htmlFor="">{props.path.charAt(0).toUpperCase() + props.path.slice(1)}</label>
+            {props.children}
+            {
+              !!props.error && (props.dirty || props.submitFailed) &&
+              <Label basic color='red' pointing='above'>
+                {
+                  props.error == 'required' ?
+                    "This field is required" :
+                    "There is an error"
+                }
+              </Label>
             }
-            return (
-                <p>
-                    {
-                        type == 'object' ?
-                            wrappedComponent :
-                            <Form.Field required={required}>
-                                <label htmlFor="">{path.charAt(0).toUpperCase() + path.slice(1)}</label>
-                                {wrappedComponent}
-                                {
-                                    !!props.error && (props.dirty || props.submitFailed) &&
-                                    <Label basic color='red' pointing='above'>
-                                        {
-                                            props.error == 'required' ?
-                                                "This field is required" :
-                                                "There is an error"
-                                        }
-                                    </Label>
-                                }
-                            </Form.Field>
-                    }
-                </p>
-            );
-        }
-    }
-};
+          </Form.Field>
+      }
+    </p>
+  );
+}
+
+export const SemanticUIkit: UIKitAPI = UIKit().
+  form((form, children) => (
+    <form
+      className={form.getState().submitting ? 'ui form loading' : 'ui form'}
+      onSubmit={(e) => { e.preventDefault(); form.submit(); }}
+    >
+      <div>
+        {children}
+      </div>
+      <br />
+      <p>
+        <input type="submit" value="Save" className="ui button" />
+      </p>
+    </form>
+  )).
+  type('string', (path, required, children) => {
+    return props => (
+      <FieldWrapper required={required} type={'string'} path={path} {...props}>
+        <Input
+          onChange={
+            e => {
+              const value = e.currentTarget.value;
+              props.change(value.length > 0 ? value : null);
+            }
+          }
+          value={props.value}
+        />
+      </FieldWrapper>
+    )
+  }).
+  path(/rating/ as any, (path, type, required) => {
+    return (props: UIKITFieldProps & { maxRating?: number }) => (
+      <FieldWrapper required={required} type={type} path={path} {...props}>
+        <Rating
+          maxRating={props.maxRating || 5}
+          onRate={
+            (e, { rating }) => {
+              props.change(rating);
+            }
+          }
+          value={props.value}
+        />
+      </FieldWrapper>
+    )
+  }).
+  path(/comment/ as any, (path, type, required) => {
+    return props => (
+      <FieldWrapper required={required} type={type} path={path} {...props}>
+        <TextArea
+          value={props.value}
+          onChange={e => { const value = e.currentTarget.value; props.change(value.length > 0 ? value : null); }}
+        />
+      </FieldWrapper>
+    )
+  })
