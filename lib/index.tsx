@@ -67,7 +67,7 @@ export const SemanticUIkit: UIKitAPI = UIKit().
               props.change(value.length > 0 ? value : null);
             }
           }
-          value={props.value}
+          value={typeof props.value === 'undefined' ? '' : props.value}
         />
       </FieldWrapper>
     )
@@ -82,18 +82,20 @@ export const SemanticUIkit: UIKitAPI = UIKit().
               props.change(rating);
             }
           }
-          value={props.value}
+          value={typeof props.value === 'undefined' ? 0 : props.value}
         />
       </FieldWrapper>
     )
   }).
   path(/comment/ as any, (path, type, required) => {
-    return props => (
-      <FieldWrapper required={required} type={type} path={path} {...props}>
-        <TextArea
-          value={props.value}
-          onChange={e => { const value = e.currentTarget.value; props.change(value.length > 0 ? value : null); }}
-        />
-      </FieldWrapper>
-    )
+    return props => {
+      return (
+        <FieldWrapper required={required} type={type} path={path} {...props}>
+          <TextArea
+            value={typeof props.value === 'undefined' ? '' : props.value}
+            onChange={e => { const value = e.currentTarget.value; props.change(value.length > 0 ? value : null); }}
+          />
+        </FieldWrapper>
+      )
+    };
   })
